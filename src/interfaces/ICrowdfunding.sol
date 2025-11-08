@@ -22,7 +22,7 @@ interface ICrowdfunding {
         bool isFlexibleFunding
     ) external returns (uint256 campaignId);
 
-    function contribute(uint256 campaignId) external payable;
+    function contribute(uint256 campaignId, uint256 amount) external;
 
     function claimFunds(uint256 campaignId) external;
 
