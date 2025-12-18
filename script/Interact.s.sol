@@ -43,18 +43,27 @@ contract Interact is Script {
 
         Crowdfunding crowdfunding = Crowdfunding(crowdfundingAddress);
 
-        // Create a campaign (creator is the broadcast sender)
-        uint256 campaignId = crowdfunding.createCampaign(1 ether, 7 days, false);
+        // Create a campaign that starts NOW for immediate testing
+        uint256 startAt = block.timestamp;
+        uint256 endAt = startAt + 7 days;
+        
+        // SAFETY CHECKS for uint32 conversion
+        require(startAt <= type(uint32).max, "startAt overflow");
+        require(endAt <= type(uint32).max, "endAt overflow");
+        
+        uint256 campaignId = crowdfunding.launch(
+            1 ether,           // goal
+            uint32(startAt),   // startAt (now safe)
+            uint32(endAt),     // endAt (now safe)
+            false              // isFlexibleFunding
+        );
         console.log("Created campaign id:", campaignId);
 
-        // Contribute (assumes approval already done if using mock)
-        uint256 contributionAmount = 0.1 ether;
-        crowdfunding.contribute(campaignId, contributionAmount);
-        console.log("Contributed", contributionAmount, "to campaign", campaignId);
+        // Pledge immediately
+        crowdfunding.pledge(campaignId, 0.1 ether);
+        console.log("Pledged 0.1 ether to campaign", campaignId);
 
         vm.stopBroadcast();
         return (crowdfundingAddress, tokenAddress);
     }
 }
-
-
